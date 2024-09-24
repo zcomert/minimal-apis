@@ -10,3 +10,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 1. Giriş 
 2. Routing HTTP Verbs
 3. Route Handlers
+4. Route Parameters

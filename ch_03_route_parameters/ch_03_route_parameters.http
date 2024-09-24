@@ -1,0 +1,6 @@
+@ch_03_route_parameters_HostAddress = http://localhost:5170
+
+GET {{ch_03_route_parameters_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
