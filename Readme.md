@@ -8,3 +8,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 
 # İçerik 
 1. Giriş 
+2. HTTP Verbs
