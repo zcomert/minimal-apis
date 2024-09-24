@@ -7,7 +7,8 @@ Minimal API'ler, hızlı prototip geliştirme ve küçük projeler için ideal b
 Minimal API'lerin öne çıkan avantajları arasında performans artışı ve daha az kod karmaşası bulunur. Tek bir dosyada, yani Program.cs dosyasında tüm işlemler toplanabilir, bu da özellikle küçük ve orta ölçekli projelerde kodun daha temiz ve yönetilebilir olmasını sağlar. Ancak, daha büyük ve karmaşık projelerde geleneksel MVC yapısı hala tercih edilebilir. 
 
 # İçerik 
-1. Giriş 
-2. Routing HTTP Verbs
-3. Route Handlers
-4. Route Parameters
+1. [Giriş](https://www.youtube.com/watch?v=5Op71vTjJ6Q&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg) 
+2. [Routing HTTP Verbs](https://www.youtube.com/watch?v=WI2YG7W8Pbk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=2)
+3. [Route Handlers](https://www.youtube.com/watch?v=YzbWu9Wa4MM&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=3)
+4. [Route Parameters](https://www.youtube.com/watch?v=1BcalNN-Uf4&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=4)
+5. [Parameter Binding](https://www.youtube.com/watch?v=mN0yhn4KZCw&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=5)
