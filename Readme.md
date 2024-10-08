@@ -12,3 +12,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 3. [Route Handlers](https://www.youtube.com/watch?v=YzbWu9Wa4MM&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=3)
 4. [Route Parameters](https://www.youtube.com/watch?v=1BcalNN-Uf4&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=4)
 5. [Parameter Binding](https://www.youtube.com/watch?v=mN0yhn4KZCw&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=5)
+6. [Results](https://www.youtube.com/watch?v=bD9JLpXzkAw&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=6)
