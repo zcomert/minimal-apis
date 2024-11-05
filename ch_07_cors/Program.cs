@@ -51,6 +51,7 @@ app.UseExceptionHandler(appError =>
             context.Response.StatusCode = contextFeature.Error switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                ArgumentOutOfRangeException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError,
             };
 
@@ -77,10 +78,15 @@ app.MapGet("/api/books", () =>
     return Book.List.Count > 0
      ? Results.Ok(Book.List)
      : Results.NotFound();
-});
+})
+.Produces<List<Book>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status404NotFound);
 
 app.MapGet("/api/books/{id:int}", (int id) =>
 {
+    if(!(id>=1 && id<=1000))
+        throw new ArgumentOutOfRangeException($"{id}"); // 400 BadRequest
+
     // Kitap var mı?
     var book = Book
         .List
@@ -90,7 +96,10 @@ app.MapGet("/api/books/{id:int}", (int id) =>
         ? Results.Ok(book)      // 200
                                 // : Results.NotFound();   // 404
         : throw new BookNotFoundException(id);
-});
+})
+.Produces<Book>(StatusCodes.Status200OK)
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest);
 
 app.MapPost("/api/books", (Book newBook) =>
 {
