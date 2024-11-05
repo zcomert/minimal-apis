@@ -1,6 +1,0 @@
-@ch_07_cors_HostAddress = http://localhost:5037
-
-GET {{ch_07_cors_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
