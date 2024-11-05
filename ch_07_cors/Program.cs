@@ -23,6 +23,22 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("All", builder =>
+    {
+        builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+    options.AddPolicy("Private", builder => 
+    {
+        builder.WithOrigins("https://www.samsun.edu.tr","https://localhost:3000")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -30,6 +46,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("All");
 
 app.UseHttpsRedirection();
 
@@ -52,6 +70,7 @@ app.UseExceptionHandler(appError =>
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 ArgumentOutOfRangeException => StatusCodes.Status400BadRequest,
+                ArgumentException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError,
             };
 
@@ -80,11 +99,12 @@ app.MapGet("/api/books", () =>
      : Results.NotFound();
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status404NotFound);
+.Produces(StatusCodes.Status404NotFound)
+.WithTags("CRUD", "GETs");
 
 app.MapGet("/api/books/{id:int}", (int id) =>
 {
-    if(!(id>=1 && id<=1000))
+    if (!(id >= 1 && id <= 1000))
         throw new ArgumentOutOfRangeException($"{id}"); // 400 BadRequest
 
     // Kitap var mı?
@@ -99,17 +119,24 @@ app.MapGet("/api/books/{id:int}", (int id) =>
 })
 .Produces<Book>(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status404NotFound)
-.Produces<ErrorDetails>(StatusCodes.Status400BadRequest);
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("GETs");
 
 app.MapPost("/api/books", (Book newBook) =>
 {
     newBook.Id = Book.List.Max(b => b.Id) + 1;    // otomatik
     Book.List.Add(newBook);
     return Results.Created($"/api/books/{newBook.Id}", newBook);
-});
+})
+.Produces<Book>(StatusCodes.Status201Created)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("CRUD");
 
 app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 {
+    if (!(id >= 1 && id <= 1000))
+        throw new ArgumentOutOfRangeException($"{id}"); // 400 BadRequest
+
     var book = Book
                 .List
                 .FirstOrDefault(b => b.Id.Equals(id));
@@ -122,10 +149,17 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
     book.Price = updateBook.Price;
 
     return Results.Ok(book);    // 200 
-});
+})
+.Produces<Book>(StatusCodes.Status200OK)
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("CRUD");
 
 app.MapDelete("/api/books/{id:int}", (int id) =>
 {
+    if (!(id >= 1 && id <= 1000))
+        throw new ArgumentOutOfRangeException($"{id}"); // 400 BadRequest
+
     var book = Book
         .List
         .FirstOrDefault(b => b.Id.Equals(id));
@@ -136,10 +170,17 @@ app.MapDelete("/api/books/{id:int}", (int id) =>
     }
     Book.List.Remove(book);
     return Results.NoContent();     // 204
-});
+})
+.Produces(StatusCodes.Status204NoContent)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.WithTags("CRUD");
 
 app.MapGet("/api/books/search", (string? title) =>
 {
+    if (title?.Length <= 2)
+        throw new ArgumentException("The length of search term must be at least 3 characters.");
+
     var books = string.IsNullOrEmpty(title)
         ? Book.List
         : Book
@@ -150,9 +191,13 @@ app.MapGet("/api/books/search", (string? title) =>
     return books.Any()
         ? Results.Ok(books)     // 200
         : Results.NoContent();  // 204
-});
+})
+.Produces<List<Book>>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status204NoContent)
+.WithTags("GETs");
 
 app.Run();
+
 
 
 public abstract class NotFoundException : Exception
