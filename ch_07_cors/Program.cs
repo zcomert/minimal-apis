@@ -23,6 +23,26 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("All", builder =>
+    {
+        builder.AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+    options.AddPolicy("Special", builder => 
+    {
+        builder.WithOrigins("http://localhost:3000",
+                            "https://www.samsun.edu.tr")
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -31,6 +51,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+app.UseCors("All");
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler(appError =>
@@ -51,6 +73,8 @@ app.UseExceptionHandler(appError =>
             context.Response.StatusCode = contextFeature.Error switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                ArgumentOutOfRangeException => StatusCodes.Status400BadRequest,
+                ArgumentException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError,
             };
 
@@ -69,7 +93,8 @@ app.MapGet("/api/error", () =>
 {
     throw new Exception("An error has been occured.");
 })
-.Produces<ErrorDetails>(StatusCodes.Status500InternalServerError);
+.Produces<ErrorDetails>(StatusCodes.Status500InternalServerError)
+.ExcludeFromDescription();
 
 app.MapGet("/api/books", () =>
 {
@@ -78,10 +103,15 @@ app.MapGet("/api/books", () =>
     : Results.NoContent();
 })
 .Produces<IEnumerable<Book>>(StatusCodes.Status200OK)
-.Produces(StatusCodes.Status204NoContent);
+.Produces(StatusCodes.Status204NoContent)
+.WithTags("CRUD", "GETs");
 
 app.MapGet("/api/books/{id:int}", (int id) =>
 {
+    if (!(id > 0 && id <= 1000))
+    {
+        throw new ArgumentOutOfRangeException("Id must be in range 1 - 1000.");
+    }
     // Kitap var mı?
     var book = Book
         .List
@@ -93,47 +123,70 @@ app.MapGet("/api/books/{id:int}", (int id) =>
         : throw new BookNotFoundException(id);
 })
 .Produces<Book>(StatusCodes.Status200OK)
-.Produces<ErrorDetails>(StatusCodes.Status200OK);
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("GETs");
 
 app.MapPost("/api/books", (Book newBook) =>
 {
     newBook.Id = Book.List.Max(b => b.Id) + 1;    // otomatik
     Book.List.Add(newBook);
     return Results.Created($"/api/books/{newBook.Id}", newBook);
-});
+})
+.Produces<Book>(StatusCodes.Status201Created)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("CRUD");
 
 app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 {
+    // id kontrolü
+    if (!(id > 0 && id < 1000))
+    {
+        throw new ArgumentOutOfRangeException("1-1000");
+    }
+
     var book = Book
                 .List
                 .FirstOrDefault(b => b.Id.Equals(id));
 
     if (book is null)
     {
-        return Results.NotFound();  // 404 : Not found!
+        throw new BookNotFoundException(id);  // 404 : Not found!
     }
     book.Title = updateBook.Title;
     book.Price = updateBook.Price;
 
     return Results.Ok(book);    // 200 
-});
+})
+.Produces<Book>(StatusCodes.Status200OK)
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("CRUD");
 
 app.MapDelete("/api/books/{id:int}", (int id) =>
 {
+    if (!(id > 0 && id <= 1000))
+        throw new ArgumentOutOfRangeException("1-1000");
+
     var book = Book
         .List
         .FirstOrDefault(b => b.Id.Equals(id));
 
     if (book is null)
-    {
-        return Results.NotFound();
-    }
+        throw new BookNotFoundException(id);
+
     Book.List.Remove(book);
     return Results.NoContent();     // 204
-});
+})
+.Produces<ErrorDetails>(StatusCodes.Status404NotFound)
+.Produces(StatusCodes.Status204NoContent)
+.WithTags("CRUD");
 
 app.MapGet("/api/books/search", (string? title) =>
 {
+    if (!(title?.Length >= 3))
+        throw new ArgumentException("The length of search term must be greater 2.");
+
     var books = string.IsNullOrEmpty(title)
         ? Book.List
         : Book
@@ -144,7 +197,11 @@ app.MapGet("/api/books/search", (string? title) =>
     return books.Any()
         ? Results.Ok(books)     // 200
         : Results.NoContent();  // 204
-});
+})
+.Produces<IEnumerable<Book>>(StatusCodes.Status200OK)
+.Produces<IEnumerable<Book>>(StatusCodes.Status204NoContent)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("GETs");
 
 app.Run();
 
