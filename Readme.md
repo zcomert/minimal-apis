@@ -13,4 +13,6 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 4. [Route Parameters](https://www.youtube.com/watch?v=1BcalNN-Uf4&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=4)
 5. [Parameter Binding](https://www.youtube.com/watch?v=mN0yhn4KZCw&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=5)
 6. [Results](https://www.youtube.com/watch?v=bD9JLpXzkAw&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=6)
-6. [Global Error Handle](https://www.youtube.com/watch?v=nBD-lFf1dxs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=7)
+7. [Global Error Handle](https://www.youtube.com/watch?v=nBD-lFf1dxs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=7)
+8. [CORS](https://www.youtube.com/watch?v=nAT7xXN_BNk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=8)
+9. [Swagger](https://www.youtube.com/watch?v=MbprGtGP8Qs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=9)
