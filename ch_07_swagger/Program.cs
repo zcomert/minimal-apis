@@ -26,7 +26,6 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddCors(options =>
 {
-    // all
     options.AddPolicy("all", builder =>
     {
         builder.AllowAnyOrigin()
@@ -34,7 +33,6 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 
-    // special
     options.AddPolicy("special", builder =>
     {
         builder.WithOrigins("https://localhost:3000")
@@ -98,8 +96,8 @@ app.MapGet("/api/error", () =>
 app.MapGet("/api/books", () =>
 {
     return Book.List.Count > 0
-        ? Results.Ok(Book.List) // 200
-        : Results.NoContent();  // 204
+        ? Results.Ok(Book.List)
+        : Results.NoContent();
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
@@ -110,14 +108,12 @@ app.MapGet("/api/books/{id:int}", (int id) =>
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
 
-    // Kitap var mÄ±?
     var book = Book
         .List
         .FirstOrDefault(b => b.Id.Equals(id));
 
     return book is not null
-        ? Results.Ok(book)      // 200
-                                // : Results.NotFound();   // 404
+        ? Results.Ok(book)
         : throw new BookNotFoundException(id);
 })
 .Produces<Book>(StatusCodes.Status200OK)
@@ -145,12 +141,12 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 
     if (book is null)
     {
-        throw new BookNotFoundException(id);  // 404 : Not found!
+        throw new BookNotFoundException(id);  
     }
     book.Title = updateBook.Title;
     book.Price = updateBook.Price;
 
-    return Results.Ok(book);    // 200 
+    return Results.Ok(book);   
 })
 .Produces<Book>(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status404NotFound)
@@ -188,8 +184,8 @@ app.MapGet("/api/books/search", (string? title) =>
                    b.Title.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
 
     return books.Any()
-        ? Results.Ok(books)     // 200
-        : Results.NoContent();  // 204
+        ? Results.Ok(books)
+        : Results.NoContent();
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
@@ -235,9 +231,9 @@ class Book
     // Seed data
     private static List<Book> _bookList = new List<Book>()
     {
-        new Book { Id = 1, Title = "Ä°nce Memed", Price = 20.00M },
-        new Book { Id = 2, Title = "KuyucaklÄ± Yusuf", Price = 15.50M },
-        new Book { Id = 3, Title = "Ã‡alÄ±kuÅŸu", Price = 18.75M }
+        new Book { Id = 1, Title = "İnce Memed", Price = 20.00M },
+        new Book { Id = 2, Title = "Kuyucaklı Yusuf", Price = 15.50M },
+        new Book { Id = 3, Title = "Çalıkuşu", Price = 18.75M }
     };
 
     public static List<Book> List => _bookList;

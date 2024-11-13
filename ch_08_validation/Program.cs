@@ -166,7 +166,15 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 
     if (!isValid)
     {
-        throw new ValidationException(validationResults.First().ErrorMessage);
+        // LINQ - Stream API
+        string errors = string.Join(".", 
+            validationResults.Select(vr => vr.ErrorMessage));
+        
+        //foreach (var vr in validationResults)
+        //{
+        //    errors = errors + vr.ErrorMessage;
+        //}
+        throw new ValidationException(errors);
     }
 
     var book = Book

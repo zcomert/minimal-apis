@@ -16,3 +16,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 7. [Global Error Handle](https://www.youtube.com/watch?v=nBD-lFf1dxs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=7)
 8. [CORS](https://www.youtube.com/watch?v=nAT7xXN_BNk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=8)
 9. [Swagger](https://www.youtube.com/watch?v=MbprGtGP8Qs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=9)
+10. [Validation](https://www.youtube.com/watch?v=S77PdaOfdEk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=10)
