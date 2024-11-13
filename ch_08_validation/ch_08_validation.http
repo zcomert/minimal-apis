@@ -1,0 +1,6 @@
+@ch_08_validation_HostAddress = http://localhost:5160
+
+GET {{ch_08_validation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
