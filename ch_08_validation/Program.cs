@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
@@ -73,7 +74,9 @@ app.UseExceptionHandler(appError =>
             context.Response.StatusCode = contextFeature.Error switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                ValidationException => StatusCodes.Status422UnprocessableEntity,
                 ArgumentOutOfRangeException => StatusCodes.Status400BadRequest,
+                ArgumentException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError,
             };
 
@@ -127,17 +130,40 @@ app.MapGet("/api/books/{id:int}", (int id) =>
 
 app.MapPost("/api/books", (Book newBook) =>
 {
+    var validationResults = new List<ValidationResult>();
+    var context = new ValidationContext(newBook);
+    var isValid = Validator
+        .TryValidateObject(newBook, context, validationResults, true);
+
+    if (!isValid)
+        return Results.UnprocessableEntity(validationResults);
+
     newBook.Id = Book.List.Max(b => b.Id) + 1;    // otomatik
     Book.List.Add(newBook);
     return Results.Created($"/api/books/{newBook.Id}", newBook);
 })
 .Produces<Book>(StatusCodes.Status201Created)
+.Produces(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
 app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
+
+    var validationResults = new List<ValidationResult>();
+    var context = new ValidationContext(updateBook);
+    var isValid = Validator
+        .TryValidateObject(updateBook, context, validationResults, true);
+
+    if (!isValid)
+    {
+        var errors = string.Join(" ",
+            validationResults.Select(v => v.ErrorMessage));
+        
+        throw new ValidationException(errors);
+    }
+        
 
     var book = Book
                 .List
@@ -155,6 +181,7 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 .Produces<Book>(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status404NotFound)
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.Produces<ErrorDetails>(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
 app.MapDelete("/api/books/{id:int}", (int id) =>
@@ -228,8 +255,14 @@ public class ErrorDetails
 
 class Book
 {
+    [Required]
     public int Id { get; set; }
+
+    [MinLength(2, ErrorMessage = "The title should include at least two characters.")]
+    [MaxLength(25, ErrorMessage = "The title must be 25 characters or less.")]
     public String? Title { get; set; }
+
+    [Range(1,100, ErrorMessage = "Price must be between 1 and 100.")]
     public Decimal Price { get; set; }
 
     // Seed data
