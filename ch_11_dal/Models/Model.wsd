@@ -1,0 +1,44 @@
+@startuml 
+title BookApi
+
+class Book{
+    +id
+    +title
+    +price
+}
+
+abstract class NotFoundException {
+    +NotFoundException(message: String)
+}
+
+class BookNotFoundException {
+    +BookNotFoundException(id: int)
+}
+
+class BookService
+{
+    -bookList:List<Book>
+    --
+    +Count:int
+    --
+    +GetBooks():List<Book>
+    +GetBookById(int:i):Book
+    +AddBook(item:Book)
+    +UpdateBook(id:int, item:Book)
+    +DeleteBook(id:int)
+    
+}
+
+interface IBookService
+{
+    +Count:int
+    +GetBooks():List<Book>
+    +GetBookById(id:int):Book
+    +AddBook(item:Book):void
+    +UpdateBook(id:int, item:Book):Book
+    +DeleteBook(id:int):void
+}
+
+BookService .up.|> IBookService : "<<implements>>"
+BookNotFoundException .up.|> NotFoundException : "<<extends>>"
+hide empty members
