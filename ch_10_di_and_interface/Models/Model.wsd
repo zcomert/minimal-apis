@@ -18,6 +18,9 @@ class BookNotFoundException {
 class BookService
 {
     -bookList:List<Book>
+    --
+    +Count:int
+    --
     +GetBooks():List<Book>
     +GetBookById(int:i):Book
     +AddBook(item:Book)
@@ -28,6 +31,7 @@ class BookService
 
 interface IBookService
 {
+    +Count:int
     +GetBooks():List<Book>
     +GetBookById(id:int):Book
     +AddBook(item:Book):void

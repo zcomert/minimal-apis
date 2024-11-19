@@ -46,7 +46,8 @@ builder.Services.AddCors(options =>
 });
 
 // DI Registration
-builder.Services.AddSingleton<BookService>();
+builder.Services
+    .AddSingleton<IBookService, BookService>();
 
 var app = builder.Build();
 
@@ -101,17 +102,17 @@ app.MapGet("/api/error", () =>
 .Produces<ErrorDetails>(StatusCodes.Status500InternalServerError)
 .ExcludeFromDescription();
 
-app.MapGet("/api/books", (BookService bookService) =>
+app.MapGet("/api/books", (IBookService bookService) =>
 {
-    return bookService.GetBooks.Count > 0
-        ? Results.Ok(bookService.GetBooks) // 200
+    return bookService.Count > 0
+        ? Results.Ok(bookService.GetBooks()) // 200
         : Results.NoContent();  // 204
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
 .WithTags("CRUD", "GETs");
 
-app.MapGet("/api/books/{id:int}", (int id, BookService bookService) =>
+app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
@@ -128,7 +129,7 @@ app.MapGet("/api/books/{id:int}", (int id, BookService bookService) =>
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("GETs");
 
-app.MapPost("/api/books", (Book newBook, BookService bookService) =>
+app.MapPost("/api/books", (Book newBook, IBookService bookService) =>
 {
     var validationResults = new List<ValidationResult>();
     var context = new ValidationContext(newBook);
@@ -146,7 +147,7 @@ app.MapPost("/api/books", (Book newBook, BookService bookService) =>
 .Produces(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapPut("/api/books/{id:int}", (int id, Book updateBook, BookService bookService) =>
+app.MapPut("/api/books/{id:int}", (int id, Book updateBook, IBookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
@@ -174,7 +175,7 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook, BookService bookServ
 .Produces<ErrorDetails>(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapDelete("/api/books/{id:int}", (int id, BookService bookService) =>
+app.MapDelete("/api/books/{id:int}", (int id, IBookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
@@ -187,12 +188,12 @@ app.MapDelete("/api/books/{id:int}", (int id, BookService bookService) =>
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("CRUD");
 
-app.MapGet("/api/books/search", (string? title, BookService bookService) =>
+app.MapGet("/api/books/search", (string? title, IBookService bookService) =>
 {
     var books = string.IsNullOrEmpty(title)
-        ? bookService.GetBooks
+        ? bookService.GetBooks()
         : bookService
-            .GetBooks
+            .GetBooks()
             .Where(b => b.Title != null &&
                    b.Title.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
 
@@ -248,7 +249,17 @@ class Book
     public Decimal Price { get; set; }
 }
 
-class BookService
+interface IBookService
+{
+    int Count { get; }
+    List<Book> GetBooks();
+    Book? GetBookById(int id);
+    void AddBook(Book item);
+    Book UpdateBook(int id, Book item);
+    void DeleteBook(int id);
+}
+
+class BookService : IBookService
 {
     private readonly List<Book> _bookList;
     public BookService()
@@ -262,7 +273,10 @@ class BookService
         };
     }
 
-    public List<Book> GetBooks => _bookList;
+    public List<Book> GetBooks() => _bookList;
+
+    public int Count => _bookList.Count;
+
     public Book? GetBookById(int id) =>
         _bookList.FirstOrDefault(b => b.Id.Equals(id));
 
