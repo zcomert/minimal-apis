@@ -17,6 +17,7 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 08. [CORS](https://www.youtube.com/watch?v=nAT7xXN_BNk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=8)
 09. [Swagger](https://www.youtube.com/watch?v=MbprGtGP8Qs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=9)
 10. [Validation](https://www.youtube.com/watch?v=S77PdaOfdEk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=10)
+11. [Dependency Injection](https://www.youtube.com/watch?v=5daGbCPOEVA&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=11)
 
 # Sunumlar
 01. [ASP.NET Core Minimal APIs](https://gamma.app/docs/ASPNET-Core-Minimal-API-Nedir-4ult8g13unlo7f7)
@@ -26,3 +27,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 08. [CORS](https://gamma.app/docs/API-Guvenligi-icin-CORS-2eztpepcumphn13)
 09. [Swagger](https://gamma.app/docs/API-Dokumantasyon-ve-Test-icin-Swagger-0b623u2hgvuxwq8)
 10. [Validation](https://gamma.app/docs/ASPNET-Core-Web-API-Icin-Validation-kxrry63shffkxcf?mode=doc)
+11. [Dependency Injection](https://gamma.app/docs/ASPNET-Core-Minimal-APIlerde-Bagmllk-Enjeksiyonu-gzheavjczso091b?mode=doc)
