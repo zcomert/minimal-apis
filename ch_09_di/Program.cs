@@ -45,6 +45,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// DI Registration
+builder.Services.AddSingleton<BookService>();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -98,29 +101,26 @@ app.MapGet("/api/error", () =>
 .Produces<ErrorDetails>(StatusCodes.Status500InternalServerError)
 .ExcludeFromDescription();
 
-app.MapGet("/api/books", () =>
+app.MapGet("/api/books", (BookService bookService) =>
 {
-    return Book.List.Count > 0
-        ? Results.Ok(Book.List) // 200
+    return bookService.GetBooks.Count > 0
+        ? Results.Ok(bookService.GetBooks) // 200
         : Results.NoContent();  // 204
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
 .WithTags("CRUD", "GETs");
 
-app.MapGet("/api/books/{id:int}", (int id) =>
+app.MapGet("/api/books/{id:int}", (int id, BookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
 
-    // Kitap var mÄ±?
-    var book = Book
-        .List
-        .FirstOrDefault(b => b.Id.Equals(id));
+    // Kitap var mi?
+    var book = bookService.GetBookById(id);
 
     return book is not null
         ? Results.Ok(book)      // 200
-                                // : Results.NotFound();   // 404
         : throw new BookNotFoundException(id);
 })
 .Produces<Book>(StatusCodes.Status200OK)
@@ -128,7 +128,7 @@ app.MapGet("/api/books/{id:int}", (int id) =>
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("GETs");
 
-app.MapPost("/api/books", (Book newBook) =>
+app.MapPost("/api/books", (Book newBook, BookService bookService) =>
 {
     var validationResults = new List<ValidationResult>();
     var context = new ValidationContext(newBook);
@@ -138,15 +138,15 @@ app.MapPost("/api/books", (Book newBook) =>
     if (!isValid)
         return Results.UnprocessableEntity(validationResults);
 
-    newBook.Id = Book.List.Max(b => b.Id) + 1;    // otomatik
-    Book.List.Add(newBook);
+    bookService.AddBook(newBook);
+
     return Results.Created($"/api/books/{newBook.Id}", newBook);
 })
 .Produces<Book>(StatusCodes.Status201Created)
 .Produces(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
+app.MapPut("/api/books/{id:int}", (int id, Book updateBook, BookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
@@ -165,17 +165,7 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
     }
 
 
-    var book = Book
-                .List
-                .FirstOrDefault(b => b.Id.Equals(id));
-
-    if (book is null)
-    {
-        throw new BookNotFoundException(id);  // 404 : Not found!
-    }
-    book.Title = updateBook.Title;
-    book.Price = updateBook.Price;
-
+    var book = bookService.UpdateBook(id, updateBook);
     return Results.Ok(book);    // 200 
 })
 .Produces<Book>(StatusCodes.Status200OK)
@@ -184,20 +174,12 @@ app.MapPut("/api/books/{id:int}", (int id, Book updateBook) =>
 .Produces<ErrorDetails>(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapDelete("/api/books/{id:int}", (int id) =>
+app.MapDelete("/api/books/{id:int}", (int id, BookService bookService) =>
 {
     if (!(id > 0 && id <= 1000))
         throw new ArgumentOutOfRangeException("1-1000");
 
-    var book = Book
-        .List
-        .FirstOrDefault(b => b.Id.Equals(id));
-
-    if (book is null)
-    {
-        throw new BookNotFoundException(id); // 404
-    }
-    Book.List.Remove(book);
+    bookService.DeleteBook(id);
     return Results.NoContent();     // 204
 })
 .Produces(StatusCodes.Status204NoContent)
@@ -205,12 +187,12 @@ app.MapDelete("/api/books/{id:int}", (int id) =>
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("CRUD");
 
-app.MapGet("/api/books/search", (string? title) =>
+app.MapGet("/api/books/search", (string? title, BookService bookService) =>
 {
     var books = string.IsNullOrEmpty(title)
-        ? Book.List
-        : Book
-            .List
+        ? bookService.GetBooks
+        : bookService
+            .GetBooks
             .Where(b => b.Title != null &&
                    b.Title.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
 
@@ -264,14 +246,56 @@ class Book
 
     [Range(1, 100, ErrorMessage = "Price must be between 1 and 100.")]
     public Decimal Price { get; set; }
+}
 
-    // Seed data
-    private static List<Book> _bookList = new List<Book>()
+class BookService
+{
+    private readonly List<Book> _bookList;
+    public BookService()
     {
-        new Book { Id = 1, Title = "Ä°nce Memed", Price = 20.00M },
-        new Book { Id = 2, Title = "KuyucaklÄ± Yusuf", Price = 15.50M },
-        new Book { Id = 3, Title = "Ã‡alÄ±kuÅŸu", Price = 18.75M }
-    };
+        // seed data
+        _bookList = new List<Book>()
+        {
+            new Book { Id = 1, Title = "Devlet", Price = 20.00M },
+            new Book { Id = 2, Title = "Ateşten Gömlek", Price = 15.50M },
+            new Book { Id = 3, Title = "Huzur", Price = 18.75M }
+        };
+    }
 
-    public static List<Book> List => _bookList;
+    public List<Book> GetBooks => _bookList;
+    public Book? GetBookById(int id) =>
+        _bookList.FirstOrDefault(b => b.Id.Equals(id));
+
+    public void AddBook(Book newBook)
+    {
+        newBook.Id = _bookList.Max(b => b.Id) + 1;
+        _bookList.Add(newBook);
+    }
+
+    public Book UpdateBook(int id, Book updateBook)
+    {
+        var book = _bookList.FirstOrDefault(b => b.Id.Equals(id));
+        if (book is null)
+        {
+            throw new BookNotFoundException(id);
+        }
+
+        book.Title = updateBook.Title;
+        book.Price = updateBook.Price;
+
+        return book;
+    }
+
+    public void DeleteBook(int id)
+    {
+        var book = _bookList.FirstOrDefault(b => b.Id.Equals(id));
+        if (book is not null)
+        {
+            _bookList.Remove(book);
+        }
+        else
+        {
+            throw new BookNotFoundException(id);
+        }
+    }
 }
