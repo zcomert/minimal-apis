@@ -6,6 +6,7 @@ package Repositories
     class RepositoryContext   {
         +Books:DbSet<Book>
         +RepositoryContext(options:DbContextOptions)
+        +OnModelCreating(modelBuilder:ModelBuilder)
     }
 }
 

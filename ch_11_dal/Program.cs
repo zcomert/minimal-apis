@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,9 @@ builder.Services.AddCors(options =>
 // DI Registration
 builder.Services
     .AddSingleton<IBookService, BookService>();
+
+builder.Services.AddDbContext<RepositoryContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("sqlite")));
 
 var app = builder.Build();
 
@@ -236,7 +241,7 @@ public class ErrorDetails
     }
 }
 
-class Book
+public class Book
 {
     [Required]
     public int Id { get; set; }
