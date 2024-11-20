@@ -1,6 +1,14 @@
 @startuml 
 title BookApi
 
+package Repositories
+{
+    class RepositoryContext   {
+        +Books:DbSet<Book>
+        +RepositoryContext(options:DbContextOptions)
+    }
+}
+
 class Book{
     +id
     +title
@@ -41,4 +49,6 @@ interface IBookService
 
 BookService .up.|> IBookService : "<<implements>>"
 BookNotFoundException .up.|> NotFoundException : "<<extends>>"
+
+RepositoryContext -up-|> DbContext : "<<extends>>"
 hide empty members
