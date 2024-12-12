@@ -6,9 +6,9 @@ left to right direction
 package Entities
 {
     class Book{
-    +id
-    +title
-    +price
+        +id
+        +title
+        +price
     }
 }
 
@@ -71,8 +71,8 @@ package Services
         --
         +GetBooks():List<Book>
         +GetBookById(int:i):Book
-        +AddBook(item:Book)
-        +UpdateBook(id:int, item:Book)
+        +AddBook(item:BookDtoForInsertion)
+        +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
         
     }
@@ -84,8 +84,8 @@ package Services
         --
         +GetBooks():List<Book>
         +GetBookById(int:i):Book
-        +AddBook(item:Book)
-        +UpdateBook(id:int, item:Book)
+        +AddBook(item:BookDtoForInsertion)
+        +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
         
     }
@@ -97,8 +97,8 @@ package Services
         --
         +GetBooks():List<Book>
         +GetBookById(int:i):Book
-        +AddBook(item:Book)
-        +UpdateBook(id:int, item:Book)
+        +AddBook(item:BookDtoForInsertion)
+        +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
     }
 }
@@ -112,7 +112,7 @@ package Abstracts
         +GetBooks():List<Book>
         +GetBookById(id:int):Book
         +AddBook(item:BookDtoForInsertion):Book
-        +UpdateBook(id:int, item:Book):Book
+        +UpdateBook(id:int, item:BookDtoForUpdate):Book
         +DeleteBook(id:int):void
     }
 }
