@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Abstracts;
+using AutoMapper;
+using Configuration;
 using Entities;
+using Entities.DTOs;
 using Entities.Exceptions;
 using Repositories;
 
@@ -8,21 +12,38 @@ namespace Services;
 public class BookServiceV3 : IBookService
 {
     private readonly BookRepository _bookRepo;
+    private readonly IMapper _mapper;
 
-    public BookServiceV3(BookRepository bookRepo)
+    public BookServiceV3(BookRepository bookRepo, IMapper mapper)
     {
         _bookRepo = bookRepo;
+        _mapper = mapper;
     }
 
     public int Count => _bookRepo.GetAll().Count;
 
-    public void AddBook(Book item)
+    public Book AddBook(BookDtoForInsertion item)
     {
-        _bookRepo.Add(item);
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(item);
+        var isValid = Validator
+            .TryValidateObject(item, context, validationResults, true);
+
+        if (!isValid)
+        {
+            var errors = string.Join(" ", validationResults.Select(v => v.ErrorMessage));
+            throw new ValidationException(errors);
+        }
+
+        var book = _mapper.Map<Book>(item);
+        _bookRepo.Add(book);
+        return book;
     }
 
     public void DeleteBook(int id)
     {
+        id.VadaliteIdInRange();
+
         var book = _bookRepo.Get(id);
         if (book is not null)
             _bookRepo.Remove(book);
@@ -30,24 +51,41 @@ public class BookServiceV3 : IBookService
             throw new BookNotFoundException(id);
     }
 
-    public Book? GetBookById(int id) =>
-        _bookRepo.Get(id);
+    public Book? GetBookById(int id)
+    {
+        id.VadaliteIdInRange();
+        var book = _bookRepo.Get(id);
+        if (book is null)
+        {
+            throw new BookNotFoundException(id);
+        }
+        return book;
+    }
 
 
     public List<Book> GetBooks() =>
         _bookRepo.GetAll();
 
 
-    public Book UpdateBook(int id, Book item)
+    public Book UpdateBook(int id, BookDtoForUpdate item)
     {
-        var book = _bookRepo.Get(id);
-        if (book is null)
+        id.VadaliteIdInRange();
+
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(item);
+        var isValid = Validator
+            .TryValidateObject(item, context, validationResults, true);
+
+        if (!isValid)
         {
-            throw new BookNotFoundException(id);
+            var errors = string.Join(" ",
+                validationResults.Select(v => v.ErrorMessage));
+
+            throw new ValidationException(errors);
         }
 
-        book.Title = item.Title;
-        book.Price = item.Price;
+        var book = GetBookById(id);
+        book = _mapper.Map(item, book);
         _bookRepo.Update(book);
         return book;
     }
