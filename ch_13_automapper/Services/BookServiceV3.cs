@@ -24,16 +24,8 @@ public class BookServiceV3 : IBookService
 
     public Book AddBook(BookDtoForInsertion item)
     {
-        var validationResults = new List<ValidationResult>();
-        var context = new ValidationContext(item);
-        var isValid = Validator
-            .TryValidateObject(item, context, validationResults, true);
-
-        if (!isValid)
-        {
-            var errors = string.Join(" ", validationResults.Select(v => v.ErrorMessage));
-            throw new ValidationException(errors); // Daha uygun bir hata yönetimi
-        }
+        // Generic validation
+        Validate(item);
 
         var book = _mapper.Map<Book>(item);
         _bookRepo.Add(book);
@@ -69,18 +61,8 @@ public class BookServiceV3 : IBookService
     {
         id.ValidateIdRange();
 
-        var validationResults = new List<ValidationResult>();
-        var context = new ValidationContext(item);
-        var isValid = Validator
-            .TryValidateObject(item, context, validationResults, true);
-
-        if (!isValid)
-        {
-            var errors = string.Join(" ",
-                validationResults.Select(v => v.ErrorMessage));
-
-            throw new ValidationException(errors);
-        }
+        // Generic validation
+        Validate(item);
 
         var book = _bookRepo.Get(id);
         if (book is null)
@@ -91,5 +73,18 @@ public class BookServiceV3 : IBookService
         book = _mapper.Map(item, book);
         _bookRepo.Update(book);
         return book;
+    }
+
+    private void Validate<T>(T item)
+    {
+        var validationResults = new List<ValidationResult>();
+        var context = new ValidationContext(item);
+        var isValid = Validator.TryValidateObject(item, context, validationResults, true);
+
+        if (!isValid)
+        {
+            var errors = string.Join(" ", validationResults.Select(v => v.ErrorMessage));
+            throw new ValidationException(errors);
+        }
     }
 }
