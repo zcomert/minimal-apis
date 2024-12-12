@@ -1,6 +1,7 @@
 @startuml 
 title BookApi
 
+left to right direction
 
 package Entities
 {
@@ -11,15 +12,32 @@ package Entities
     }
 }
 
+package Entities.DTOs
+{
+    abstract class BookDto
+    {
+        +title:String
+        +price:Decimal
+    }
+    class BookDtoForInsertion
+    {
+        
+    }
+    class BookDtoForUpdate
+    {
+
+    }
+}
+
 package Entities.Exceptions
 {
     abstract class NotFoundException {
-    +NotFoundException(message: String)
-}
+        +NotFoundException(message: String)
+    }
 
-class BookNotFoundException {
-    +BookNotFoundException(id: int)
-}
+    class BookNotFoundException {
+        +BookNotFoundException(id: int)
+    }
 }
 
 
@@ -93,16 +111,35 @@ package Abstracts
         +Count:int
         +GetBooks():List<Book>
         +GetBookById(id:int):Book
-        +AddBook(item:Book):void
+        +AddBook(item:BookDtoForInsertion):Book
         +UpdateBook(id:int, item:Book):Book
         +DeleteBook(id:int):void
     }
 }
 
+package Configuration {
+    class MappingProfile {
+        
+    }
+    class ConfigurationExtensions {
+        {static} +ValidateIdRange(int id): void
+        {static} +UseCustomExceptionHandler(IApplicationBuilder app): void
+        {static} +AddCustomCors(services:IServiceCollection): IServiceCollection
+        {static} +AddCustomSwagger(services:IServiceCollection): IServiceCollection
+    }
+}
+
+MappingProfile -right-|> Profile : "<<extends>>"
+
 BookService .up.|> IBookService : "<<implements>>"
 BookServiceV2 .up.|> IBookService : "<<implements>>"
 BookServiceV3 .up.|> IBookService : "<<implements>>"
-BookNotFoundException -up-|> NotFoundException : "<<extends>>"
 
-RepositoryContext -up-|> DbContext : "<<extends>>"
+BookNotFoundException -right-|> NotFoundException : "<<extends>>"
+
+RepositoryContext -right-|> DbContext : "<<extends>>"
+
+BookDtoForUpdate -left-|> BookDto : "<<extends>>"
+BookDtoForInsertion -right-|> BookDto : "<<extends>>"
+
 hide empty members
