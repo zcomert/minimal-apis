@@ -61,15 +61,8 @@ app.MapGet("/api/books", (IBookService bookService) =>
 
 app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
 {
-    if (!(id > 0 && id <= 1000))
-        throw new ArgumentOutOfRangeException("1-1000");
-
-    // Kitap var mi?
     var book = bookService.GetBookById(id);
-
-    return book is not null
-        ? Results.Ok(book)      // 200
-        : throw new BookNotFoundException(id);
+    return Results.Ok(book);
 })
 .Produces<Book>(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status404NotFound)
@@ -78,17 +71,8 @@ app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
 
 app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService) =>
 {
-    var validationResults = new List<ValidationResult>();
-    var context = new ValidationContext(newBook);
-    var isValid = Validator
-        .TryValidateObject(newBook, context, validationResults, true);
-
-    if (!isValid)
-        return Results.UnprocessableEntity(validationResults);
-
     var book = bookService.AddBook(newBook);
-
-    return Results.Created($"/api/books/{book.Id}", newBook);
+    return Results.Created($"/api/books/{book.Id}", book.Id);
 })
 .Produces<Book>(StatusCodes.Status201Created)
 .Produces(StatusCodes.Status422UnprocessableEntity)
@@ -96,20 +80,6 @@ app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService
 
 app.MapPut("/api/books/{id:int}", (int id, BookDtoForUpdate updateBook, IBookService bookService) =>
 {
-    var validationResults = new List<ValidationResult>();
-    var context = new ValidationContext(updateBook);
-    var isValid = Validator
-        .TryValidateObject(updateBook, context, validationResults, true);
-
-    if (!isValid)
-    {
-        var errors = string.Join(" ",
-            validationResults.Select(v => v.ErrorMessage));
-
-        throw new ValidationException(errors);
-    }
-
-
     var book = bookService.UpdateBook(id, updateBook);
     return Results.Ok(book);    // 200 
 })
