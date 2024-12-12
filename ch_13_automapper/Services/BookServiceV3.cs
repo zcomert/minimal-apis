@@ -1,5 +1,8 @@
 using Abstracts;
+using AutoMapper;
+using Configuration;
 using Entities;
+using Entities.DTOs;
 using Entities.Exceptions;
 using Repositories;
 
@@ -8,21 +11,26 @@ namespace Services;
 public class BookServiceV3 : IBookService
 {
     private readonly BookRepository _bookRepo;
+    private readonly IMapper _mapper;
 
-    public BookServiceV3(BookRepository bookRepo)
+    public BookServiceV3(BookRepository bookRepo, IMapper mapper)
     {
         _bookRepo = bookRepo;
+        _mapper = mapper;
     }
 
     public int Count => _bookRepo.GetAll().Count;
 
-    public void AddBook(Book item)
+    public Book AddBook(BookDtoForInsertion item)
     {
-        _bookRepo.Add(item);
+        var book = _mapper.Map<Book>(item);
+        _bookRepo.Add(book);
+        return book;
     }
 
     public void DeleteBook(int id)
     {
+        id.ValidateIdRange();
         var book = _bookRepo.Get(id);
         if (book is not null)
             _bookRepo.Remove(book);
@@ -38,16 +46,16 @@ public class BookServiceV3 : IBookService
         _bookRepo.GetAll();
 
 
-    public Book UpdateBook(int id, Book item)
+    public Book UpdateBook(int id, BookDtoForUpdate item)
     {
+        id.ValidateIdRange();
         var book = _bookRepo.Get(id);
         if (book is null)
         {
             throw new BookNotFoundException(id);
         }
 
-        book.Title = item.Title;
-        book.Price = item.Price;
+        book = _mapper.Map(item, book);
         _bookRepo.Update(book);
         return book;
     }
