@@ -20,6 +20,7 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 11. [Dependency Injection](https://www.youtube.com/watch?v=5daGbCPOEVA&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=11)
 12. [Dependency Injection and Interfaces](https://www.youtube.com/watch?v=ARbZ1_klwnA&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=12)
 13. [Repository Management](https://www.youtube.com/watch?v=e3NX3Bm-fNc&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=13)
+14. [ORM](https://www.youtube.com/watch?v=LNa4rOQEhuc&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=14)
 
 # Sunumlar
 01. [ASP.NET Core Minimal APIs](https://gamma.app/docs/ASPNET-Core-Minimal-API-Nedir-4ult8g13unlo7f7)
@@ -33,3 +34,4 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 12. [SQLite](https://gamma.app/docs/SQLite-Nedir-n3fqg1mki2rg5rn?mode=doc)
 13. [Paket Yönetimi](https://gamma.app/docs/DotNet-Ekosisteminde-Paket-Yonetimi-Teknik-ve-Akademik-Bir-Incele-kckpnqqunfk33g4?mode=doc)
 14. [dotnet tool](https://gamma.app/docs/Dotnet-Tool-Gelistirici-Verimliliginin-Anahtar-lbm4sl4kkkwb1ru?mode=doc)
+15. [ORM](https://gamma.app/docs/ORM-Nesne-Iliskisel-Esleme-omr0t09g1j16al3?mode=doc)
