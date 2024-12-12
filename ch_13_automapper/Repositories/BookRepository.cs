@@ -1,3 +1,5 @@
+using Entities;
+
 namespace Repositories;
 
 public class BookRepository

@@ -2,20 +2,29 @@
 title BookApi
 
 
-
-class Book{
+package Entities
+{
+    class Book{
     +id
     +title
     +price
+    }
 }
 
-abstract class NotFoundException {
+package Entities.Exceptions
+{
+    abstract class NotFoundException {
     +NotFoundException(message: String)
 }
 
 class BookNotFoundException {
     +BookNotFoundException(id: int)
 }
+}
+
+
+
+
 
 package Repositories
 {
@@ -93,7 +102,7 @@ package Abstracts
 BookService .up.|> IBookService : "<<implements>>"
 BookServiceV2 .up.|> IBookService : "<<implements>>"
 BookServiceV3 .up.|> IBookService : "<<implements>>"
-BookNotFoundException .up.|> NotFoundException : "<<extends>>"
+BookNotFoundException -up-|> NotFoundException : "<<extends>>"
 
 RepositoryContext -up-|> DbContext : "<<extends>>"
 hide empty members

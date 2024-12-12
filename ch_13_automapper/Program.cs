@@ -1,7 +1,9 @@
+
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
-using System.Text.Json;
 using Abstracts;
+using Entities;
+using Entities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
@@ -219,43 +221,3 @@ app.MapGet("/api/books/search", (string? title, IBookService bookService) =>
 app.Run();
 
 
-public abstract class NotFoundException : Exception
-{
-    protected NotFoundException(string message) : base(message)
-    {
-
-    }
-}
-
-public sealed class BookNotFoundException : NotFoundException
-{
-    public BookNotFoundException(int id) : base($"The book with {id} could not be found!")
-    {
-
-    }
-}
-
-public class ErrorDetails
-{
-    public int StatusCode { get; set; }
-    public String? Message { get; set; }
-    public String? AtOccured => DateTime.Now.ToLongDateString();
-
-    public override string ToString()
-    {
-        return JsonSerializer.Serialize(this);
-    }
-}
-
-public class Book
-{
-    [Required]
-    public int Id { get; set; }
-
-    [MinLength(2, ErrorMessage = "The title should include at least two characters.")]
-    [MaxLength(25, ErrorMessage = "The title must be 25 characters or less.")]
-    public String? Title { get; set; }
-
-    [Range(1, 100, ErrorMessage = "Price must be between 1 and 100.")]
-    public Decimal Price { get; set; }
-}

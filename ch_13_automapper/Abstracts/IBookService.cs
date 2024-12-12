@@ -1,3 +1,5 @@
+using Entities;
+
 namespace Abstracts;
 
 public interface IBookService

@@ -1,4 +1,6 @@
 using Abstracts;
+using Entities;
+using Entities.Exceptions;
 using Repositories;
 
 namespace Services;
