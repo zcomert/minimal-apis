@@ -65,10 +65,6 @@ public class BookServiceV3 : IBookService
         Validate(item);
 
         var book = _bookRepo.Get(id);
-        if (book is null)
-        {
-            throw new BookNotFoundException(id);
-        }
 
         book = _mapper.Map(item, book);
         _bookRepo.Update(book);
