@@ -7,7 +7,7 @@ namespace Configuration;
 
 public static class ConfigurationExtensions
 {
-     public static void ValidateIdRange(this int id)
+     public static void VadaliteIdInRange(this int id)
      {
           if (!(id > 0 && id <= 1000))
                throw new ArgumentOutOfRangeException("1-1000");
