@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Entities.DTOs;
 
-public abstract record BookDto
+public abstract record BookDtoBase
 {
     [MinLength(2, ErrorMessage = "The title should include at least two characters.")]
     [MaxLength(25, ErrorMessage = "The title must be 25 characters or less.")]
@@ -10,4 +10,15 @@ public abstract record BookDto
 
     [Range(1, 100, ErrorMessage = "Price must be between 1 and 100.")]
     public Decimal Price { get; init; }
+
+    [Required(ErrorMessage = "Category ID is required.")]
+    public int CategoryId { get; init; }
+}
+
+
+public record BookDto : BookDtoBase
+{
+    public int Id { get; init; }
+    public Category Category { get; init; }
+
 }

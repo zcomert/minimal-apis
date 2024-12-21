@@ -24,17 +24,7 @@ public class BookServiceV3 : IBookService
 
     public Book AddBook(BookDtoForInsertion item)
     {
-        var validationResults = new List<ValidationResult>();
-        var context = new ValidationContext(item);
-        var isValid = Validator
-            .TryValidateObject(item, context, validationResults, true);
-
-        if (!isValid)
-        {
-            var errors = string.Join(" ", validationResults.Select(v => v.ErrorMessage));
-            throw new ValidationException(errors);
-        }
-
+        Validate(item);
         var book = _mapper.Map<Book>(item);
         _bookRepo.Add(book);
         return book;
@@ -51,42 +41,52 @@ public class BookServiceV3 : IBookService
             throw new BookNotFoundException(id);
     }
 
-    public Book? GetBookById(int id)
+    public BookDto? GetBookById(int id)
     {
         id.VadaliteIdInRange();
+        
+        var book = _bookRepo.Get(id);
+        
+        if (book is null)
+        {
+            throw new BookNotFoundException(id);
+        }
+        return _mapper.Map<BookDto>(book);
+    }
+
+
+    public List<BookDto> GetBooks()
+    {
+        var books = _bookRepo.GetAll();
+        return _mapper.Map<List<BookDto>>(books);
+    }
+        
+    public Book UpdateBook(int id, BookDtoForUpdate item)
+    {
+        id.VadaliteIdInRange();
+        Validate(item);
         var book = _bookRepo.Get(id);
         if (book is null)
         {
             throw new BookNotFoundException(id);
         }
+        _mapper.Map(item, book);
+        _bookRepo.Update(book);
         return book;
     }
 
+    
 
-    public List<Book> GetBooks() =>
-        _bookRepo.GetAll();
-
-
-    public Book UpdateBook(int id, BookDtoForUpdate item)
+    private void Validate<T>(T item)
     {
-        id.VadaliteIdInRange();
-
         var validationResults = new List<ValidationResult>();
         var context = new ValidationContext(item);
-        var isValid = Validator
-            .TryValidateObject(item, context, validationResults, true);
+        var isValid = Validator.TryValidateObject(item, context, validationResults, true);
 
-        if (!isValid)
+        if(!isValid)
         {
-            var errors = string.Join(" ",
-                validationResults.Select(v => v.ErrorMessage));
-
+            var errors = string.Join(" ", validationResults.Select(v => v.ErrorMessage));
             throw new ValidationException(errors);
         }
-
-        var book = GetBookById(id);
-        book = _mapper.Map(item, book);
-        _bookRepo.Update(book);
-        return book;
     }
 }
