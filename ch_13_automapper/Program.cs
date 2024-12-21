@@ -1,8 +1,6 @@
 using Abstracts;
 using Configuration;
-using Configuration;
 using Entities;
-using Entities.DTOs;
 using Entities.DTOs;
 using Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +67,6 @@ app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
 .WithTags("GETs");
 
 app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService) =>
-app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService) =>
 {
     var book = bookService.AddBook(newBook);
     return Results.Created($"/api/books/{book.Id}", book.Id);
@@ -78,7 +75,6 @@ app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService
 .Produces(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapPut("/api/books/{id:int}", (int id, BookDtoForUpdate updateBook, IBookService bookService) =>
 app.MapPut("/api/books/{id:int}", (int id, BookDtoForUpdate updateBook, IBookService bookService) =>
 {
     var book = bookService.UpdateBook(id, updateBook);
