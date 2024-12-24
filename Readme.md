@@ -23,7 +23,7 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 14. [ORM](https://www.youtube.com/watch?v=LNa4rOQEhuc&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=14)
 15. [AutoMapper](https://www.youtube.com/watch?v=m-G4VKqeATE&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=15)
 16. [Extension methods and configuration](https://www.youtube.com/watch?v=l6QSCKbjLYY&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=16)
-17. [Relation](https://www.youtube.com/watch?v=deZ9sU2KGbU&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=17)
+17. [Relations](https://www.youtube.com/watch?v=deZ9sU2KGbU&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=17)
 
 # Sunumlar
 01. [ASP.NET Core Minimal APIs](https://gamma.app/docs/ASPNET-Core-Minimal-API-Nedir-4ult8g13unlo7f7)
