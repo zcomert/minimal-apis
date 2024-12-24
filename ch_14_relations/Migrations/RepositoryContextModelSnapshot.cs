@@ -22,13 +22,21 @@ namespace BookApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("URL")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Books");
 
@@ -36,21 +44,74 @@ namespace BookApi.Migrations
                         new
                         {
                             Id = 1,
+                            CategoryId = 1,
                             Price = 20.00m,
-                            Title = "Devlet"
+                            Title = "Devlet",
+                            URL = "/images/1.jpg"
                         },
                         new
                         {
                             Id = 2,
+                            CategoryId = 2,
                             Price = 15.50m,
-                            Title = "Ateşten Gömlek"
+                            Title = "Ateşten Gömlek",
+                            URL = "/images/1.jpg"
                         },
                         new
                         {
                             Id = 3,
+                            CategoryId = 3,
                             Price = 18.75m,
-                            Title = "Huzur"
+                            Title = "Huzur",
+                            URL = "/images/1.jpg"
                         });
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Felsefe"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Roman"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Deneme"
+                        });
+                });
+
+            modelBuilder.Entity("Entities.Book", b =>
+                {
+                    b.HasOne("Entities.Category", "Category")
+                        .WithMany("Books")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("Entities.Category", b =>
+                {
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }
