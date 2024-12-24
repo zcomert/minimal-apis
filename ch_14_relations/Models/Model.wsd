@@ -1,27 +1,44 @@
-@startuml 
+@startuml
 title BookApi
 
 left to right direction
 
-package Entities
-{
-    class Book{
-        +id
-        +title
-        +price
+package Entities {
+    class Book {
+        +Id: int
+        +Title: String
+        +Price: Decimal
+        +URL: String
+        +CategoryId: int
+        +Category: Category
     }
+
+    class Category {
+        +CategoryId: int
+        +CategoryName: String
+        +Books: ICollection<Book>
+    }
+
+    ' Category "1" --> "0..*" Book : "Books"
+    Book "n" o-down-> "1" Category : "one to many"
 }
 
-package Entities.DTOs
+package DTOs
 {
-    abstract class BookDto
+    abstract class BookDtoBase
     {
         +title:String
         +price:Decimal
+        +categoryId:int
+    }
+
+    class BookDto
+    {
+        +id:int
     }
     class BookDtoForInsertion
     {
-        
+
     }
     class BookDtoForUpdate
     {
@@ -41,23 +58,29 @@ package Entities.Exceptions
 }
 
 
-
-
-
 package Repositories
 {
     class RepositoryContext   {
         +Books:DbSet<Book>
+        +Categories:DbSet<Category>
         +RepositoryContext(options:DbContextOptions)
         +OnModelCreating(modelBuilder:ModelBuilder)
     }
+
+    abstract class RepositoryBase<T> {
+        # _context:RepositoryContext
+        + Get(int id): T?
+        + GetAll(): List<T>
+        + Add(T item): void
+        + Remove(T item): void
+        + Update(T item): void
+    }
     class BookRepository {
-        -context:RepositoryContext
         +Get(id):Book?
         +GetAll():List<Book>
-        +Add(item:Book)
-        +Remove(item:Book)
-        +Update(item:Book)
+    }
+    class CategoryRepository {
+        
     }
 }
 
@@ -74,7 +97,7 @@ package Services
         +AddBook(item:BookDtoForInsertion)
         +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
-        
+
     }
     class BookServiceV2
     {
@@ -87,7 +110,7 @@ package Services
         +AddBook(item:BookDtoForInsertion)
         +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
-        
+
     }
     class BookServiceV3
     {
@@ -100,6 +123,7 @@ package Services
         +AddBook(item:BookDtoForInsertion)
         +UpdateBook(id:int, item:BookDtoForUpdate)
         +DeleteBook(id:int)
+        -Validate<T>(item:T)
     }
 }
 
@@ -119,7 +143,7 @@ package Abstracts
 
 package Configuration {
     class MappingProfile {
-        
+
     }
     class ConfigurationExtensions {
         {static} +ValidateIdRange(int id): void
@@ -135,11 +159,18 @@ BookService .up.|> IBookService : "<<implements>>"
 BookServiceV2 .up.|> IBookService : "<<implements>>"
 BookServiceV3 .up.|> IBookService : "<<implements>>"
 
+
+BookRepository -l-|> RepositoryBase  : "<<extends>>"
+CategoryRepository -r-|> RepositoryBase  : "<<extends>>"
+RepositoryBase o-d- RepositoryContext : "has-a"
+RepositoryContext -r-|> DbContext : "<<extends>>"
+
 BookNotFoundException -right-|> NotFoundException : "<<extends>>"
 
-RepositoryContext -right-|> DbContext : "<<extends>>"
 
-BookDtoForUpdate -left-|> BookDto : "<<extends>>"
-BookDtoForInsertion -right-|> BookDto : "<<extends>>"
+
+BookDto -up-|> BookDtoBase : "<<extends>>"
+BookDtoForUpdate -left-|> BookDtoBase : "<<extends>>"
+BookDtoForInsertion -right-|> BookDtoBase : "<<extends>>"
 
 hide empty members
