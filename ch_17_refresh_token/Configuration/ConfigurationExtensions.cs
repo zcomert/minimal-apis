@@ -99,6 +99,31 @@ public static class ConfigurationExtensions
                          Url = new Uri("https://www.youtube.com/@virtual.campus")
                     }
                });
+
+               c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+               {
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme.",
+                    Name="Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+               });
+               
+               c.AddSecurityRequirement(new OpenApiSecurityRequirement
+               {
+                    {
+                         new OpenApiSecurityScheme
+                         {
+                              Reference = new OpenApiReference
+                              {
+                                   Type = ReferenceType.SecurityScheme,
+                                   Id = "Bearer"
+                              }
+                         },
+                         new string[] {}
+                    }
+               });
+          
           });
 
           return services;

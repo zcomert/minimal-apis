@@ -1,0 +1,27 @@
+@startuml
+title Extended Sequence Diagram for [GET] /api/books Endpoint
+
+actor Client
+actor "Auth Service" as Auth
+participant "Book Service" as BookService
+participant "Book Repository" as BookRepo
+participant "Repository Base" as RepoBase
+participant API
+
+Client -> API: GET /api/books
+API -> Auth: Validate Token
+alt Valid Token and User/Role = Admin or User
+    Auth --> API: Role Verified
+    API -> BookService: Get Books
+    BookService -> BookRepo: Fetch Books
+    BookRepo -> RepoBase: Query Database
+    RepoBase --> BookRepo: Data
+    BookRepo --> BookService: List<Book>
+    BookService --> API: List<Book>
+    API --> Client: 200 OK with Book List
+else Unauthorized Role or Invalid Token
+    Auth --> API: Invalid Token or Role
+    API --> Client: 401 Unauthorized
+end
+
+@enduml

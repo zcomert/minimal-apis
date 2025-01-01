@@ -58,7 +58,7 @@ app.MapGet("/api/error", () =>
 .Produces<ErrorDetails>(StatusCodes.Status500InternalServerError)
 .ExcludeFromDescription();
 
-app.MapGet("/api/books", [Authorize(Roles ="User")](IBookService bookService) =>
+app.MapGet("/api/books", [Authorize(Roles = "Admin, User")] (IBookService bookService) =>
 {
     return bookService.Count > 0
         ? Results.Ok(bookService.GetBooks()) // 200
@@ -79,7 +79,7 @@ app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("GETs");
 
-app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService) =>
+app.MapPost("/api/books", [Authorize(Roles = "Admin")](BookDtoForInsertion newBook, IBookService bookService) =>
 {
     var book = bookService.AddBook(newBook);
     return Results.Created($"/api/books/{book.Id}", book.Id);
@@ -88,7 +88,7 @@ app.MapPost("/api/books", (BookDtoForInsertion newBook, IBookService bookService
 .Produces(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapPut("/api/books/{id:int}", (int id, BookDtoForUpdate updateBook, IBookService bookService) =>
+app.MapPut("/api/books/{id:int}", [Authorize(Roles ="User")] (int id, BookDtoForUpdate updateBook, IBookService bookService) =>
 {
     var book = bookService.UpdateBook(id, updateBook);
     return Results.Ok(book);    // 200 
@@ -99,7 +99,7 @@ app.MapPut("/api/books/{id:int}", (int id, BookDtoForUpdate updateBook, IBookSer
 .Produces<ErrorDetails>(StatusCodes.Status422UnprocessableEntity)
 .WithTags("CRUD");
 
-app.MapDelete("/api/books/{id:int}", (int id, IBookService bookService) =>
+app.MapDelete("/api/books/{id:int}", [Authorize(Roles ="Admin")] (int id, IBookService bookService) =>
 {
     bookService.DeleteBook(id);
     return Results.NoContent();     // 204
@@ -149,14 +149,23 @@ app.MapPost("/api/login", async (UserForAuthenticationDto userDto,
         return Results.Unauthorized(); // 401
     return Results.Ok(new
     {
-        Token = await authService.CreateTokenAsync()
+        Token = await authService.CreateTokenAsync(true)
     });
 })
 .Produces(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status401Unauthorized)
 .WithTags("Auth");
 
-
+app.MapPost("/api/refresh", async (TokenDto tokenDto, 
+    IAuthService authService) =>
+{
+    var tokenDtoToReturn = await authService
+        .RefreshTokenAsync(tokenDto);
+    
+    return Results.Ok(tokenDtoToReturn);
+})
+.Produces(StatusCodes.Status200OK)
+.WithTags("Auth");
 
 app.Run();
 
