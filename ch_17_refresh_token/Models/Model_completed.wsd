@@ -22,6 +22,8 @@ package Entities {
     class User {
         +FirstName:String?
         +LastName:String?
+        +RefreshToken:String
+        +RefreshTokenExpiryTime:DateTime
     }
 
 
