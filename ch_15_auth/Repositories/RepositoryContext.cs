@@ -1,9 +1,11 @@
 using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repositories;
 
-public class RepositoryContext : DbContext
+public class RepositoryContext : IdentityDbContext<User>
 {
     public DbSet<Book> Books { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -62,6 +64,20 @@ public class RepositoryContext : DbContext
                 Price = 18.75M,
                 URL = "/images/1.jpg",
                 CategoryId = 3
+            }
+        );
+    
+        // Seed the Role data
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Name = "Admin",
+                NormalizedName = "ADMIN"
+            },
+            new IdentityRole
+            {
+                Name = "User",
+                NormalizedName = "USER"
             }
         );
     }

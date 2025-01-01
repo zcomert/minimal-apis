@@ -1,7 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using Entities;
 using Entities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using Repositories;
 
 namespace Configuration;
 
@@ -96,5 +99,22 @@ public static class ConfigurationExtensions
           });
 
           return services;
+     }
+
+     public static void ConfigureIdentity(this IServiceCollection services)
+     {
+          var builder = services.AddIdentity<User, IdentityRole>(options =>
+          {
+               options.Password.RequireDigit = false;
+               options.Password.RequiredLength = 6;
+               options.Password.RequireLowercase = false;
+               options.Password.RequireNonAlphanumeric = false;
+               options.Password.RequireUppercase = false;
+               options.User.RequireUniqueEmail = true;
+               options.SignIn.RequireConfirmedEmail = false;
+               options.SignIn.RequireConfirmedPhoneNumber = false;
+          })
+               .AddEntityFrameworkStores<RepositoryContext>()
+               .AddDefaultTokenProviders();
      }
 }

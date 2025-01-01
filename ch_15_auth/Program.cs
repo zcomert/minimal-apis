@@ -3,6 +3,7 @@ using Configuration;
 using Entities;
 using Entities.DTOs;
 using Entities.Exceptions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using Services;
@@ -14,6 +15,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddCustomSwagger();
 builder.Services.AddCustomCors();
 
+builder.Services.ConfigureIdentity();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+
 
 // DI Registration
 builder.Services
@@ -21,6 +26,9 @@ builder.Services
 
 builder.Services
     .AddScoped<IBookService, BookServiceV3>();
+
+builder.Services
+    .AddScoped<IAuthService, AuthenticationManager>();
 
 builder.Services.AddDbContext<RepositoryContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("sqlite")));
@@ -36,6 +44,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("all");
 app.UseHttpsRedirection();
 app.UseCustomExceptionHandler();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 
@@ -112,6 +123,22 @@ app.MapGet("/api/books/search", (string? title, IBookService bookService) =>
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
 .WithTags("GETs");
+
+
+app.MapPost("/api/auth", async (UserForRegistrationDto userDto, 
+    IAuthService authService) =>
+{
+    var result = await authService
+        .RegisterUserAsync(userDto);
+    
+    return result.Succeeded
+        ? Results.Ok(result)
+        : Results.BadRequest(result.Errors);
+})
+.Produces<IdentityResult>(StatusCodes.Status200OK)
+.Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
+.WithTags("Auth");
+
 
 app.Run();
 
