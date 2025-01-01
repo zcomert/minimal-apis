@@ -3,6 +3,7 @@ using Configuration;
 using Entities;
 using Entities.DTOs;
 using Entities.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
@@ -16,7 +17,7 @@ builder.Services.AddCustomSwagger();
 builder.Services.AddCustomCors();
 
 builder.Services.ConfigureIdentity();
-builder.Services.AddAuthentication();
+builder.Services.ConfigureJwt(builder.Configuration);
 builder.Services.AddAuthorization();
 
 
@@ -57,7 +58,7 @@ app.MapGet("/api/error", () =>
 .Produces<ErrorDetails>(StatusCodes.Status500InternalServerError)
 .ExcludeFromDescription();
 
-app.MapGet("/api/books", (IBookService bookService) =>
+app.MapGet("/api/books", [Authorize(Roles ="User")](IBookService bookService) =>
 {
     return bookService.Count > 0
         ? Results.Ok(bookService.GetBooks()) // 200
@@ -65,6 +66,7 @@ app.MapGet("/api/books", (IBookService bookService) =>
 })
 .Produces<List<Book>>(StatusCodes.Status200OK)
 .Produces(StatusCodes.Status204NoContent)
+.RequireAuthorization()
 .WithTags("CRUD", "GETs");
 
 app.MapGet("/api/books/{id:int}", (int id, IBookService bookService) =>
@@ -125,12 +127,12 @@ app.MapGet("/api/books/search", (string? title, IBookService bookService) =>
 .WithTags("GETs");
 
 
-app.MapPost("/api/auth", async (UserForRegistrationDto userDto, 
+app.MapPost("/api/auth", async (UserForRegistrationDto userDto,
     IAuthService authService) =>
 {
     var result = await authService
         .RegisterUserAsync(userDto);
-    
+
     return result.Succeeded
         ? Results.Ok(result)
         : Results.BadRequest(result.Errors);
@@ -138,6 +140,22 @@ app.MapPost("/api/auth", async (UserForRegistrationDto userDto,
 .Produces<IdentityResult>(StatusCodes.Status200OK)
 .Produces<ErrorDetails>(StatusCodes.Status400BadRequest)
 .WithTags("Auth");
+
+
+app.MapPost("/api/login", async (UserForAuthenticationDto userDto,
+    IAuthService authService) =>
+{
+    if (!await authService.ValidateUserAsync(userDto))
+        return Results.Unauthorized(); // 401
+    return Results.Ok(new
+    {
+        Token = await authService.CreateTokenAsync()
+    });
+})
+.Produces(StatusCodes.Status200OK)
+.Produces<ErrorDetails>(StatusCodes.Status401Unauthorized)
+.WithTags("Auth");
+
 
 
 app.Run();
