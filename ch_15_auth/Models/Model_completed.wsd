@@ -19,12 +19,22 @@ package Entities {
         +Books: ICollection<Book>
     }
 
+    class User {
+        +FirstName:String?
+        +LastName:String?
+    }
+
+
+
+    User --|> IdentityUser : "<<extends>>"
+
     ' Category "1" --> "0..*" Book : "Books"
     Book "n" o-down-> "1" Category : "one to many"
 }
 
-package DTOs
+package Entities.DTOs
 {
+
     abstract class BookDtoBase
     {
         +title:String
@@ -44,6 +54,25 @@ package DTOs
     {
 
     }
+
+    class UserForRegistrationDto {
+        + FirstName: String?
+        + LastName: String?
+        + UserName: String <<Required>>
+        + Password: String <<Required>>
+        + Email: String?
+        + PhoneNumber: String?
+        + Roles: ICollection<String>
+    }
+    class UserForAuthenticationDto {
+        +userName:String <<Required>>
+        +password:String <<Required>>
+    }
+
+    class TokenDto {
+        + AccessToken: String
+        + RefreshToken: String
+    }
 }
 
 package Entities.Exceptions
@@ -60,6 +89,10 @@ package Entities.Exceptions
 
 package Repositories
 {
+    class IdentityDbContext<User>
+    {
+
+    }
     class RepositoryContext   {
         +Books:DbSet<Book>
         +Categories:DbSet<Category>
@@ -80,36 +113,41 @@ package Repositories
         +GetAll():List<Book>
     }
     class CategoryRepository {
-        
+
     }
+
+
+
+
 }
 
 package Services
 {
+    class AuthenticationManager {
+        - _mapper: IMapper
+        - _userManager: UserManager<User>
+        - _configuration: IConfiguration
+        - _user: User?
+
+        + RegisterUserAsync(userForRegistrationDto: UserForRegistrationDto): Task<IdentityResult>
+        + ValidateUserAsync(userForAuthDto: UserForAuthenticationDto): Task<bool>
+        + CreateTokenAsync(populateExp: bool): Task<TokenDto>
+        + RefreshTokenAsync(tokenDto: TokenDto): Task<TokenDto>
+        - GetSigningCredentials(): SigningCredentials
+        - GetClaims(): Task<List<Claim>>
+        - GenerateTokenOptions(signingCredentials: SigningCredentials, claims: List<Claim>): JwtSecurityToken
+        - GenerateRefreshToken(): String
+        - GetPrincipalFromExpiredToken(token: String): ClaimsPrincipal
+        - Validate<T>(item: T): void
+    }
+
     class BookService
     {
-        -bookList:List<Book>
-        --
-        +Count:int
-        --
-        +GetBooks():List<Book>
-        +GetBookById(int:i):Book
-        +AddBook(item:BookDtoForInsertion)
-        +UpdateBook(id:int, item:BookDtoForUpdate)
-        +DeleteBook(id:int)
 
     }
     class BookServiceV2
     {
-        -context:RepositoryContext
-        --
-        +Count:int
-        --
-        +GetBooks():List<Book>
-        +GetBookById(int:i):Book
-        +AddBook(item:BookDtoForInsertion)
-        +UpdateBook(id:int, item:BookDtoForUpdate)
-        +DeleteBook(id:int)
+
 
     }
     class BookServiceV3
@@ -125,6 +163,10 @@ package Services
         +DeleteBook(id:int)
         -Validate<T>(item:T)
     }
+
+
+
+
 }
 
 
@@ -139,6 +181,13 @@ package Abstracts
         +UpdateBook(id:int, item:BookDtoForUpdate):Book
         +DeleteBook(id:int):void
     }
+
+    interface IAuthenticationService {
+        + RegisterUserAsync(userForRegistrationDto: UserForRegistrationDto): Task<IdentityResult>
+        + ValidateUserAsync(userForAuthDto: UserForAuthenticationDto): Task<bool>
+        + CreateTokenAsync(populateExp: bool): Task<TokenDto>
+        + RefreshTokenAsync(tokenDto: TokenDto): Task<TokenDto>
+    }
 }
 
 package Configuration {
@@ -150,6 +199,8 @@ package Configuration {
         {static} +UseCustomExceptionHandler(IApplicationBuilder app): void
         {static} +AddCustomCors(services:IServiceCollection): IServiceCollection
         {static} +AddCustomSwagger(services:IServiceCollection): IServiceCollection
+        {static} +ConfigureIdentity(services: IServiceCollection): void
+        {static} +ConfigureJWT(services: IServiceCollection, configuration: IConfiguration): void
     }
 }
 
@@ -163,7 +214,7 @@ BookServiceV3 .up.|> IBookService : "<<implements>>"
 BookRepository -l-|> RepositoryBase  : "<<extends>>"
 CategoryRepository -r-|> RepositoryBase  : "<<extends>>"
 RepositoryBase o-d- RepositoryContext : "has-a"
-RepositoryContext -r-|> DbContext : "<<extends>>"
+RepositoryContext -r-|> IdentityDbContext : "<<extends>>"
 
 BookNotFoundException -right-|> NotFoundException : "<<extends>>"
 
@@ -172,5 +223,7 @@ BookNotFoundException -right-|> NotFoundException : "<<extends>>"
 BookDto -up-|> BookDtoBase : "<<extends>>"
 BookDtoForUpdate -left-|> BookDtoBase : "<<extends>>"
 BookDtoForInsertion -right-|> BookDtoBase : "<<extends>>"
+
+AuthenticationManager .right.|> IAuthenticationService : "<<implements>>"
 
 hide empty members
