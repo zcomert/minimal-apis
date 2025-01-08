@@ -26,6 +26,7 @@ Minimal API'lerin öne çıkan avantajları arasında performans artışı ve da
 17. [Relations](https://www.youtube.com/watch?v=deZ9sU2KGbU&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=17)
 18. [Identity](https://www.youtube.com/watch?v=bltAkFyQPQs&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=18)
 19. [JWT](https://www.youtube.com/watch?v=vHZOo_ubzaY&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=19)
+20. [Refresh Token](https://www.youtube.com/watch?v=ImzlwTTLx8w&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=20)
 
 # Sunumlar
 01. [ASP.NET Core Minimal APIs](https://gamma.app/docs/ASPNET-Core-Minimal-API-Nedir-4ult8g13unlo7f7)
