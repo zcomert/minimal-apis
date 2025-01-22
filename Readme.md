@@ -6,7 +6,7 @@ Minimal API'ler, rota tanımlamaları için MapGet, MapPost gibi yöntemler kull
 Minimal API'ler, hızlı prototip geliştirme ve küçük projeler için ideal bir çözümdür.
 Minimal API'lerin öne çıkan avantajları arasında performans artışı ve daha az kod karmaşası bulunur. Tek bir dosyada, yani Program.cs dosyasında tüm işlemler toplanabilir, bu da özellikle küçük ve orta ölçekli projelerde kodun daha temiz ve yönetilebilir olmasını sağlar. Ancak, daha büyük ve karmaşık projelerde geleneksel MVC yapısı hala tercih edilebilir. 
 
-# Videolar 
+# Youtube {Virtual Campus} | Videolar 
 01. [Giriş](https://www.youtube.com/watch?v=5Op71vTjJ6Q&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg) 
 02. [Routing HTTP Verbs](https://www.youtube.com/watch?v=WI2YG7W8Pbk&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=2) 
 03. [Route Handlers](https://www.youtube.com/watch?v=YzbWu9Wa4MM&list=PLK37qYAhi0Ed9yogmznGl2eGspYc_FSbg&index=3)
