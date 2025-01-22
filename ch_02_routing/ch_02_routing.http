@@ -1,6 +1,0 @@
-@ch_02_routing_HostAddress = http://localhost:5149
-
-GET {{ch_02_routing_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

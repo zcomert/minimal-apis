@@ -1,1 +1,0 @@
-// Author Servis gelecek

@@ -1,6 +1,0 @@
-@ch_09_di_HostAddress = http://localhost:5023
-
-GET {{ch_09_di_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

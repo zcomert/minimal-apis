@@ -1,6 +1,0 @@
-@ch_11_dal_HostAddress = http://localhost:5216
-
-GET {{ch_11_dal_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

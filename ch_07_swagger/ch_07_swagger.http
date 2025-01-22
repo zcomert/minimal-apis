@@ -1,6 +1,0 @@
-@ch_07_swagger_HostAddress = http://localhost:5112
-
-GET {{ch_07_swagger_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
